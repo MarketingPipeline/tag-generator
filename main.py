@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from requests_html import HTMLSession
 import datetime
 import json
 import os
@@ -186,7 +187,10 @@ def scrapeimdb(imdburl, scrapecount):
         pDialog.update(0, _getstr(30011), " ", " ")
     ifcancel()
     try:
-        imdbpage = requests.get(imdburl).text
+        session = HTMLSession()
+        SendRequest = session.get(imdburl)
+        SendRequest.html.render()
+        imdbpage = SendRequest.text
         imdbuser = re.findall(r'<title>(.+?)</title>', imdbpage)
         if imdbuser[0] == "Your Watchlist - IMDb":
             imdbuser = str(imdbuser[1])
