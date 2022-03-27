@@ -5,7 +5,6 @@
        provider-name="wellspokenman">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="script.module.elementtree"   version="1.2.7"/>
     <import addon="script.module.requests" version="2.12.4"/>
     <import addon="script.module.six" version="1.9.0"/>
     <import addon="script.module.oauthlib" version="2.0.1"/>
