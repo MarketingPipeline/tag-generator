@@ -180,33 +180,37 @@ def writetags(xbmcid, newtag, xbmctag):
     jsonresponse = json.loads(xbmc.executeJSONRPC(jsonurl))
 
 
-def scrapeimdb(imdburl, scrapecount):
-    """Scrapes IMDb given a URL and a scrape count (counter for how many times it has run)"""
-    internet_test("http://www.imdb.com")
-    if len(sys.argv) == 2:
-        pDialog.update(0, _getstr(30011), " ", " ")
-    ifcancel()
-    try:
-        session = HTMLSession()
-        SendRequest = session.get(imdburl)
-        SendRequest.html.render()
-        imdbpage = SendRequest.text
-        imdbuser = re.findall(r'<title>(.+?)</title>', imdbpage)
-        if imdbuser[0] == "Your Watchlist - IMDb":
-            imdbuser = str(imdbuser[1])
-        else:
-            imdbuser = str(imdbuser[0])
-        imdblist = re.findall(r'"(tt[0-9]{7})"', imdbpage)
-        imdblist = sorted(set(imdblist))
-        debuglog("TAG-GEN: Found these IMDb tags on " + str(imdbuser) + ": " + str(imdburl) + ": " + str(imdblist))
-        return imdblist, imdbuser
-    except Exception as e:
-        if len(sys.argv) == 2:
-            dialog = xbmcgui.Dialog()
-            ok = dialog.ok(_getstr(30000), imdburl + _getstr(30012))
-        xbmc.log(msg="TAG-GEN: " + imdburl + " contains no IMDb IDs. Check URL and retry.", level=xbmc.LOGERROR)
-        debuglog("TAG-GEN: " + str(e))
-        sys.exit(1)
+def scrapeimdb(imdburl):
+    Repeat = True
+    Page = 1
+    while Repeat is True:
+        try:
+            imdbpage = requests.get(imdburl).text
+            imdbuser = re.findall(r'<title>(.+?)</title>', imdbpage)
+            NextPage = re.findall(r'class="flat-button lister-page-next next-page', imdbpage)
+            if imdbuser[0] == "Your Watchlist - IMDb":
+                imdbuser = str(imdbuser[1])
+            else:
+                imdbuser = str(imdbuser[0])
+            imdblist = re.findall(r'"(tt[0-9]{7})"', imdbpage)
+            imdblist = sorted(set(imdblist))
+            if NextPage:
+                print("TAG-GEN: Found these IMDb tags on " + str(imdbuser) + ": " + str(imdburl) + ": " + str(imdblist))
+                Page += 1
+                imdburl = "https://www.imdb.com/list/ls579379733/"
+                imdburl = imdburl + f'?sort=list_order,asc&st_dt=&mode=detail&page={Page}'
+                Repeat = True
+            elif not NextPage:
+                print("TAG-GEN: Found these IMDb tags on " + str(imdbuser) + ": " + str(imdburl) + ": " + str(imdblist))
+                Repeat = False
+                return imdblist, imdbuser
+        except Exception as e:
+            if len(sys.argv) == 2:
+                dialog = xbmcgui.Dialog()
+                ok = dialog.ok(_getstr(30000), imdburl + _getstr(30012))
+            xbmc.log(msg="TAG-GEN: " + imdburl + " contains no IMDb IDs. Check URL and retry.", level=xbmc.LOGERROR)
+            debuglog("TAG-GEN: " + str(e))
+            sys.exit(1)
 
 
 def writeimdbtags(imdblist, medialist, newimdbtag):
