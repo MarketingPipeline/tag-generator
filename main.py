@@ -30,6 +30,10 @@ nap = 1  # seconds
 def _getstr(id):
     return str(__language__(id))
 
+def log(msg, level=xbmc.LOGDEBUG):
+    xbmc.log(msg='[{addon}]: {msg}'.format(addon=ID, msg=msg), level=level)
+
+
 
 if len(sys.argv) != 2:
     xbmc.sleep(1000)
