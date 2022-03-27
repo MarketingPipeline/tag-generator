@@ -33,7 +33,7 @@ def _getstr(id):
 
 if len(sys.argv) != 2:
     xbmc.sleep(1000)
-    xbmc.log(msg="TAG-GEN: Starting as a service.", level=xbmc.LOGNOTICE)
+    log(msg="TAG-GEN: Starting as a service.", xbmc.LOGINFO)
 
 
 ###################################################################
@@ -48,7 +48,7 @@ def internet_test(url):
     if len(sys.argv) == 2:
         dialog = xbmcgui.Dialog()
         ok = dialog.ok(_getstr(30000), url + _getstr(30001))
-    xbmc.log(msg="TAG-GEN: " + str(url) + " unreachable. Check network and retry.", level=xbmc.LOGERROR)
+    log(msg="TAG-GEN: " + str(url) + " unreachable. Check network and retry.", xbmc.LOGERROR)
     sys.exit(1)
 
 
@@ -61,7 +61,7 @@ def ifcancel():
 
 def debuglog(string):
     if c_debug:
-        xbmc.log(msg=string, level=xbmc.LOGDEBUG)
+        log(msg=string, xbmc.LOGDEBUG)
 
 
 def notify(input):
